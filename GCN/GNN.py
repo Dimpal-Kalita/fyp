@@ -13,7 +13,8 @@ from data_processing import load_data_split, set_seeds
 from plots import plot_metrics_and_curves
 # from gnn_model import GNNModel
 from memory_efficient_gnn import MemoryEfficientGNN
-
+from data_processing import load_data_splits, MolecularFeatureExtractor, ProteinLigandDataset
+import pandas as pd
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs):
     """
@@ -89,12 +90,30 @@ def evaluate_model(model, loader, criterion):
     
     return avg_loss, accuracy, rmsd_total
 
+def store_preprocessed_data(train_data, csv_path):
+    """
+    Stores preprocessed data in a CSV file.
+    """
+    # Convert train_data to a list of dictionaries
+    data_list = []
+    for data in train_data:
+        print(data)
+        # data_list.append(data_dict)
+    # Create a DataFrame from the list of dictionaries
+    df = pd.DataFrame(data_list)
+
+    # Save the DataFrame to a CSV file
+    df.to_csv(csv_path, index=False)
+    print(f"Preprocessed data saved to {csv_path}")
+
+
 if __name__ == "__main__":
     set_seeds(42)
-    data_dir = "./GCN/data"  # Path to PDB files
+    data_dir = "./GCN/data1"  # Path to PDB files
     print("Loading data...")
-    train_data, val_data, test_data = load_data_split(data_dir)
+    train_data, val_data, test_data = load_data_split(data_dir)    
     print(f"Train: {len(train_data)}, Val: {len(val_data)}, Test: {len(test_data)}")
+    store_preprocessed_data(train_data,"./processed_train_data.csv")
 
     train_loader = DataLoader(train_data, batch_size=64, shuffle=True)
     val_loader = DataLoader(val_data, batch_size=32)
@@ -110,6 +129,11 @@ if __name__ == "__main__":
         model, train_loader, val_loader, criterion, optimizer, scheduler, epochs=20
     )
 
+    # Save the trained model
+    model_save_path = "./output/trained_gnn_model.pt"
+    torch.save(model.state_dict(), model_save_path)
+    print(f"Model saved to {model_save_path}")
+    
     print("Evaluating the model...")    
     #prediction.py called
 
@@ -131,3 +155,4 @@ if __name__ == "__main__":
     
     # Now we can call the plotting function with both arguments
     plot_metrics_and_curves(train_losses, val_losses, train_acc, val_acc, all_preds, all_labels)
+    

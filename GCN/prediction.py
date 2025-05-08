@@ -48,12 +48,12 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     if model_type in ["GCN", "MemoryEfficientGNN"]:
-        data_dir = "./data"  # Path to PDB files
+        data_dir = "./GCN/data"  # Path to PDB files
         _, _, test_data = load_data_split(data_dir)
 
         test_loader = DataLoader(test_data, batch_size=32)
 
-        model_path = "./output/best_model.pt"  # Path to the saved model
+        model_path = "./output/trained_gnn_model.pt"  # Path to the saved model
         preds, labels = predict(model_path, test_loader, model_type, device)
 
         # Print results

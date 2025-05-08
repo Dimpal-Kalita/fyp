@@ -11,6 +11,7 @@ import torch
 from torch_geometric.data import Data
 from Bio import PDB
 from sklearn.model_selection import train_test_split
+import pandas as pd
 
 ELEMENTS = {
     # Define atomic numbers for elements
@@ -154,7 +155,7 @@ class ProteinLigandDataset(Dataset):
         for item in tqdm(self.split_data['metadata']):
             pdb_id = item['pdb_id']
             try:
-                complex_path = os.path.join("Medusa_Graph/data", pdb_id, f"{pdb_id}_complex_ad4.pdb")
+                complex_path = os.path.join("Medusa_Graph/data", pdb_id, f"{pdb_id}_complex_vina.pdb")
                 with open(complex_path, 'r') as f:
                     complex_data = f.read()
 
@@ -180,6 +181,8 @@ class ProteinLigandDataset(Dataset):
 
     def get(self, idx):
         return self.processed_data[idx]
+
+
 
 def load_data_splits(project_path):
     """
