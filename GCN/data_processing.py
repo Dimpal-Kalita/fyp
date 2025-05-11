@@ -228,11 +228,12 @@ def pdb_to_graph(file_path):
 
     return Data(x=x, edge_index=edge_index, y=y)
 
+from feature import featurize_complex
 def load_data_split(data_dir, train_ratio=0.7, val_ratio=1.5, test_ratio=1.5):
     """
     Loads and splits PDB files into train, validation, and test datasets.
     """
-    all_files = [os.path.join(root, file) for root, _, files in os.walk(data_dir) for file in files if file.endswith(".pdb")]
+    all_files = [os.path.join(root, file) for root, _, files in os.walk(data_dir) for file in files if file.endswith("_vina.pdb")]
 
     if not all_files:
         raise ValueError("No PDB files found in the specified directory.")
@@ -240,8 +241,7 @@ def load_data_split(data_dir, train_ratio=0.7, val_ratio=1.5, test_ratio=1.5):
     train_files, temp_files = train_test_split(all_files, train_size=train_ratio)
     val_files, test_files = train_test_split(temp_files, test_size=test_ratio / (test_ratio + val_ratio))
     
-    train_data = [pdb_to_graph(f) for f in train_files]
-    val_data = [pdb_to_graph(f) for f in val_files]
-    test_data = [pdb_to_graph(f) for f in test_files]
-    
+    train_data = [featurize_complex(f) for f in train_files]
+    val_data = [featurize_complex(f) for f in val_files]
+    test_data = [featurize_complex(f) for f in test_files]
     return train_data, val_data, test_data
